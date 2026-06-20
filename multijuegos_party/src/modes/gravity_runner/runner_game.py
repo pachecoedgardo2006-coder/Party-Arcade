@@ -1,8 +1,10 @@
+# src/modes/gravity_runner/runner_game.py
 import pygame
 import random
 from config import settings
 from src.scenes.base_scene import BaseScene
-from .entities import Jugador, Obstaculo
+from .domain.player import Jugador
+from .domain.obstacle import Obstaculo
 
 class RunnerGame(BaseScene):
     def __init__(self, manager):
@@ -18,7 +20,7 @@ class RunnerGame(BaseScene):
         self.temporizador_obstaculo = 0
         self.puntuacion = 0
         self.velocidad_juego = 7
-        self.estado_interno = "JUGANDO" # JUGANDO, GAME_OVER
+        self.estado_interno = "JUGANDO"
 
     def manejar_eventos(self, eventos):
         for evento in eventos:
@@ -29,33 +31,37 @@ class RunnerGame(BaseScene):
                     if evento.key == pygame.K_SPACE:
                         self.reiniciar_partida()
                     elif evento.key == pygame.K_m:
-                        # IMPORTACIÓN LOCAL: Regresa al menú selector de juegos de forma limpia
                         from src.scenes.game_select import GameSelect
                         self.manager.cambiar_escena(GameSelect(self.manager))
 
     def actualizar(self):
-        if self.estado_interno == "JUGANDO":
-            self.jugador.actualizar()
-            self.velocidad_juego += 0.002
-            self.temporizador_obstaculo += 1
-            
-            frecuencia_minima = max(35, 90 - int(self.velocidad_juego * 2))
-            if self.temporizador_obstaculo > random.randint(frecuencia_minima, frecuencia_minima + 35):
-                self.obstaculos.append(Obstaculo(self.velocidad_juego))
-                self.temporizador_obstaculo = 0
+        if self.estado_interno != "JUGANDO":
+            return
 
-            rect_jugador = self.jugador.obtener_rect()
-            for obs in self.obstaculos[:]:
-                obs.actualizar()
-                
-                if rect_jugador.colliderect(obs.obtener_rect()):
-                    self.estado_interno = "GAME_OVER"
-                    if self.puntuacion > self.mejor_puntuacion:
-                        self.mejor_puntuacion = self.puntuacion
-                
-                if obs.x + obs.ancho < 0:
-                    self.obstaculos.remove(obs)
-                    self.puntuacion += 1
+        self.jugador.actualizar()
+        self.velocidad_juego += 0.002
+        self.temporizador_obstaculo += 1
+        
+        # Generación de obstáculos escalada por velocidad
+        frecuencia_minima = max(35, 90 - int(self.velocidad_juego * 2))
+        if self.temporizador_obstaculo > random.randint(frecuencia_minima, frecuencia_minima + 35):
+            self.obstaculos.append(Obstaculo(self.velocidad_juego))
+            self.temporizador_obstaculo = 0
+
+        rect_jugador = self.jugador.obtener_rect()
+        for obs in self.obstaculos[:]:
+            obs.actualizar()
+            
+            # Colisión estricta
+            if rect_jugador.colliderect(obs.obtener_rect()):
+                self.estado_interno = "GAME_OVER"
+                if self.puntuacion > self.mejor_puntuacion:
+                    self.mejor_puntuacion = self.puntuacion
+            
+            # Limpieza de memoria fuera de pantalla
+            if obs.x + obs.ancho < 0:
+                self.obstaculos.remove(obs)
+                self.puntuacion += 1
 
     def dibujar_escenario(self, pantalla):
         pantalla.fill(settings.COLOR_FONDO)
@@ -63,8 +69,6 @@ class RunnerGame(BaseScene):
         pygame.draw.rect(pantalla, settings.COLOR_PLATAFORMA, (0, settings.SUELO_Y, settings.ANCHO, settings.ALTURA_PLATAFORMA))
         pygame.draw.line(pantalla, settings.LINEA_NEON, (0, settings.TECHO_Y), (settings.ANCHO, settings.TECHO_Y), 3)
         pygame.draw.line(pantalla, settings.LINEA_NEON, (0, settings.SUELO_Y), (settings.ANCHO, settings.SUELO_Y), 3)
-
-
 
     def dibujar(self, pantalla):
         self.dibujar_escenario(pantalla)
@@ -82,13 +86,8 @@ class RunnerGame(BaseScene):
         elif self.estado_interno == "GAME_OVER":
             texto_game_over = self.fuente_grande.render("¡GAME OVER!", True, settings.JUGADOR_COLOR)
             texto_score_final = self.fuente_pequena.render(f"Puntuación final: {self.puntuacion}", True, settings.TEXTO_COLOR)
+            texto_reintentar = self.fuente_pequena.render("Presiona [ESPACIO] para reintentar o [M] para Menú", True, settings.OBSTACULO_COLOR)
             
-            # --- MODIFICAMOS ESTA LÍNEA PARA AGREGAR LA INDICACIÓN VISUAL ---
-            texto_reintentar = self.fuente_pequena.render(
-                "Presiona [ESPACIO] para reintentar o [M] para Menú", True, settings.OBSTACULO_COLOR
-            )
-            
-            # Ajuste de posición centrado en pantalla
             pantalla.blit(texto_game_over, (settings.ANCHO // 2 - texto_game_over.get_width() // 2, settings.ALTO // 2 - 80))
             pantalla.blit(texto_score_final, (settings.ANCHO // 2 - texto_score_final.get_width() // 2, settings.ALTO // 2 + 10))
             pantalla.blit(texto_reintentar, (settings.ANCHO // 2 - texto_reintentar.get_width() // 2, settings.ALTO // 2 + 50))

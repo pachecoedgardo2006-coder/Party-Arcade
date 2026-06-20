@@ -55,10 +55,20 @@ multijuegos_party/
         ├── __init__.py
         ├── base_mode.py        # Clase base que normaliza los métodos que cada juego debe implementar
         │
-        ├── gravity_runner/     # MODO 1: Adaptación multijugador local del juego base de script.py
+        ├── gravity_runner/
         │   ├── __init__.py
-        │   ├── runner_game.py  # Controlador del estado interno, colisiones y marcador del juego
-        │   └── entities.py     # Clases Jugador, Obstáculo y Partícula acopladas a este modo
+        │   ├── runner_game.py       # Controlador principal del modo (orquestador)
+        │   │
+        │   ├── core/                # 🧠 LÓGICA PURA Y FÍSICAS (Sin Pygame si es posible)
+        │   │   ├── __init__.py
+        │   │   ├── physics.py       # Motor de colisiones y cálculo de delta/límites
+        │   │   └── particle_sys.py  # Gestor y pool de efectos visuales (estelas)
+        │   │
+        │   └── domain/              # 🎮 ENTIDADES DEL JUEGO
+        │       ├── __init__.py
+        │       ├── player.py        # Clase Jugador (Solo propiedades y estados)
+        │       ├── obstacle.py      # Clase Obstáculo y su factory de tipos
+        │       └── constants.py     # Valores fijos exclusivos de este minijuego
         │
         ├── modo_juego_2/       # MODO 2: (Espacio reservado para el siguiente juego arcade)
         │   ├── __init__.py
