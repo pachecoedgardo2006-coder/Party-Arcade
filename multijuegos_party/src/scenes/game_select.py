@@ -3,6 +3,7 @@ from config import settings
 from src.scenes.base_scene import BaseScene
 from src.ui.components import Boton
 from src.modes.gravity_runner.runner_game import RunnerGame
+from src.modes.modo_juego_2.mode_two_game import ModeTwoGame
 
 class GameSelect(BaseScene):
     def __init__(self, manager):
@@ -15,10 +16,10 @@ class GameSelect(BaseScene):
             "1. GRAVITY RUNNER", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
-        # Placeholder para los próximos juegos del compendio
-        self.btn_bloqueado = Boton(
+        # Botón para iniciar el Modo 2 (Snake)
+        self.btn_snake = Boton(
             settings.ANCHO // 2 - 200, 290, 400, 55,
-            "2. MODO BLOQUEADO (PRÓXIMAMENTE)", settings.COLOR_PLATAFORMA, settings.COLOR_PLATAFORMA, (100, 100, 120)
+            "2. SNAKE CLÁSICO", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
         self.btn_volver = Boton(
@@ -34,6 +35,9 @@ class GameSelect(BaseScene):
             if self.btn_runner.manejar_eventos(evento):
                 self.manager.cambiar_escena(RunnerGame(self.manager))
                 
+            if self.btn_snake.manejar_eventos(evento):
+                self.manager.cambiar_escena(ModeTwoGame(self.manager))
+                
             if self.btn_volver.manejar_eventos(evento):
                 self.manager.cambiar_escena(MainMenu(self.manager))
 
@@ -47,5 +51,5 @@ class GameSelect(BaseScene):
         pantalla.blit(txt_titulo, (settings.ANCHO // 2 - txt_titulo.get_width() // 2, 100))
         
         self.btn_runner.dibujar(pantalla)
-        self.btn_bloqueado.dibujar(pantalla)
+        self.btn_snake.dibujar(pantalla) # Dibujamos el nuevo botón interactivo
         self.btn_volver.dibujar(pantalla)
