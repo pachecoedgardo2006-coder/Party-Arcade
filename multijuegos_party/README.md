@@ -38,7 +38,7 @@ multijuegos_party/
     │
     ├── engine/                 # Núcleo operativo del motor del Launcher
     │   ├── __init__.py
-    │   └── manager.py          # Clase constructora del bucle principal y swicheo de pantallas
+    │   └── manager.py          # Clase constructor del bucle principal y swicheo de pantallas
     │
     ├── ui/                     # Componentes visuales genéricos y compartidos
     │   ├── __init__.py
@@ -60,12 +60,12 @@ multijuegos_party/
         │   ├── core/            # 🧠 Lógica pura y físicas
         │   │   ├── __init__.py
         │   │   ├── particle_sys.py
-        │   │   └── physics.py
+        │   │   └── physics.py       #
         │   └── domain/          # 👥 Entidades del juego
         │       ├── __init__.py
         │       ├── constants.py
-        │       ├── obstacle.py
-        │       └── player.py
+        │       ├── obstacle.py      #
+        │       └── player.py        
         │
         ├── battle_snake/       # 🐍 MODO 2: Versus Snake Modularizado
         │   ├── __init__.py
@@ -79,8 +79,16 @@ multijuegos_party/
         │       ├── food.py      # Entidad comida y su algoritmo de reubicación aleatoria segura
         │       └── snake.py     # Entidad serpiente (gestión de cuerpo, dirección e ID de jugador)
         │
-        └── modo_juego_3/       # MODO 3 al 7... (Estructura modularizada idéntica en desarrollo)
-            └── __init__.py
+        └── memory_grid/        # 🧠 MODO 3: Memory Grid (Tablero de Pares por Turnos)
+            ├── __init__.py
+            ├── memory_game.py  # Orquestador principal del modo (interfaz visual y clics del mouse)
+            ├── core/            # 🧠 Mecánicas puras y control lógico de turnos
+            │   ├── __init__.py
+            │   └── logic.py     # Lógica pura: validación de pares, mezcla aleatoria y flujo de puntaje
+            └── domain/          # 👥 Entidades del juego (Modelado de datos de la grilla)
+                ├── __init__.py
+                ├── card.py      # Entidad tarjeta (estado atómico de visibilidad y colisiones)
+                └── constants.py # Parámetros locales: grilla 5x10, colores Neón locales y timers
 ```
 
 ---
@@ -115,6 +123,13 @@ El mítico arcade de la serpiente reinventado en una intensa arena competitiva l
 * **`domain/food.py`**: Implementa lógica inteligente de reubicación mediante `food.reubicar(cuerpos_totales)`, asegurando de forma predictiva que el alimento jamás aparezca debajo de ninguno de los jugadores.
 * **`core/logic.py` (SnakeLogic)**: Concentra las reglas de negocio puras del juego. Realiza el chequeo de colisiones cruzadas (si una serpiente choca contra sí misma o contra el cuerpo del rival) de manera estricta y agnóstica a la librería gráfica.
 * **`mode_two_game.py`**: Actúa como el controlador principal. Capta de forma diferenciada las entradas de control (**Jugador 1: WASD** y **Jugador 2: Flechas de dirección**) y despacha de manera unificada los estados de la partida (`JUGANDO` / `GAME_OVER`).
+
+### 🧠 Modo 3: Memory Grid (`src/modes/memory_grid/`)
+Un desafío táctico de memoria visual y concentración por turnos, donde dos jugadores compiten en una grilla de 5 × 10 por encontrar la mayor cantidad de parejas de iconos.
+* **`domain/card.py`**: Modela el comportamiento y el estado individual de cada una de las 50 casillas del tablero (si está oculta, volteada temporalmente o resuelta con éxito). Expone métodos matemáticos para mapear su geometría con los límites del puntero físico del ratón.
+* **`domain/constants.py`**: Centraliza de manera estricta las filas, columnas, dimensiones de diseño neón y los intervalos de tiempo en milisegundos (el temporizador inicial de memorización de 4 segundos y el retraso de bloqueo por error).
+* **`core/logic.py` (MemoryLogic)**: Concentra las reglas de negocio e integridad del minijuego. Ejecuta el algoritmo de mezcla aleatoria de los 25 pares de identificadores, valida si las dos tarjetas seleccionadas coinciden y gestiona de manera encapsulada el flujo estricto del cambio de turnos (P1 vs P2) según los aciertos.
+* **`memory_game.py`**: Actúa como la escena operativa principal acoplada al Hub. Controla la captura de coordenadas del ratón, dibuja el tablero centrado dinámicamente según la resolución global e implementa la máquina de estados interna (`MEMORIZANDO`, `JUGANDO`, `BLOQUEADO`, `GAME_OVER`) que congela clics ilegítimos o maliciosos durante los procesos de animación.
 
 ---
 ## 🧠 Leyes y Buenas Prácticas Aplicadas
