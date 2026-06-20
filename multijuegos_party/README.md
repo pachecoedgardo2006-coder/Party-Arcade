@@ -14,20 +14,19 @@ Este proyecto surge como la evolución y refactorización estructural de un prot
 *   **Estilo de Código:** Cumplimiento estricto de **PEP 8** (Constantes en `UPPER_CASE`, funciones/variables en `snake_case` y clases en `PascalCase`).
 
 ---
-
 ## 📂 Arquitectura del Proyecto (Diseño de Carpetas)
 
-La estructura está organizada jerárquicamente para que el núcleo de la aplicación funcione de manera agnóstica a los juegos. Añadir un nuevo modo de juego no requiere modificar el lanzador ni las configuraciones básicas:
+La estructura está organizada jerárquicamente para garantizar una modularización absoluta. Cada minijuego divide sus responsabilidades aislando el dominio (entidades) de su núcleo lógico y del orquestador gráfico:
 
 ```text
 multijuegos_party/
 │
 ├── main.py                     # Punto de entrada único del ciclo de vida de la aplicación
-├── README-v2.md                # Documentación técnica del ecosistema (Este archivo)
+├── README.md                   # Documentación técnica del ecosistema
 │
 ├── config/                     # Configuraciones e inicializaciones globales compartidas
 │   ├── __init__.py
-│   └── settings.py             # Dimensiones de ventana, FPS, paletas de colores y mapeo de controles (P1, P2)
+│   └── settings.py             # Dimensiones de ventana, FPS, paletas de colores y mapeo de controles
 │
 ├── assets/                     # Repositorio centralizado de recursos multimedia estáticos
 │   ├── fonts/                  # Fuentes tipográficas vectoriales (.ttf)
@@ -49,35 +48,39 @@ multijuegos_party/
     │   ├── __init__.py
     │   ├── base_scene.py       # Interfaz o clase abstracta para el polimorfismo de pantallas
     │   ├── main_menu.py        # Menú principal de bienvenida de la aplicación
-    │   └── game_select.py      # Panel de selección o "Lobby" para elegir entre los 7 modos
+    │   └── game_select.py      # Panel de selección o "Lobby" para elegir entre los modos
     │
-    └── modes/                  # 🚀 CONTENEDOR EXCLUSIVO PARA LOS 7 MODOS DE JUEGO
+    └── modes/                  # 🚀 CONTENEDOR EXCLUSIVO PARA LOS MODOS DE JUEGO
         ├── __init__.py
         ├── base_mode.py        # Clase base que normaliza los métodos que cada juego debe implementar
         │
-        ├── gravity_runner/
+        ├── gravity_runner/      # 🎮 MODO 1: Carrera de Gravedad Inversa (Multijugador)
         │   ├── __init__.py
-        │   ├── runner_game.py       # Controlador principal del modo (orquestador)
-        │   │
-        │   ├── core/                # 🧠 LÓGICA PURA Y FÍSICAS (Sin Pygame si es posible)
+        │   ├── runner_game.py   # Orquestador principal del modo (conecta lógica y render)
+        │   ├── core/            # 🧠 Lógica pura y físicas
         │   │   ├── __init__.py
-        │   │   ├── physics.py       # Motor de colisiones y cálculo de delta/límites
-        │   │   └── particle_sys.py  # Gestor y pool de efectos visuales (estelas)
-        │   │
-        │   └── domain/              # 🎮 ENTIDADES DEL JUEGO
+        │   │   ├── particle_sys.py
+        │   │   └── physics.py
+        │   └── domain/          # 👥 Entidades del juego
         │       ├── __init__.py
-        │       ├── player.py        # Clase Jugador (Solo propiedades y estados)
-        │       ├── obstacle.py      # Clase Obstáculo y su factory de tipos
-        │       └── constants.py     # Valores fijos exclusivos de este minijuego
+        │       ├── constants.py
+        │       ├── obstacle.py
+        │       └── player.py
         │
-        ├── modo_juego_2/       # MODO 2: (Espacio reservado para el siguiente juego arcade)
+        ├── battle_snake/       # 🐍 MODO 2: Versus Snake Modularizado
         │   ├── __init__.py
-        │   ├── mode_two_game.py
-        │   └── entities.py
+        │   ├── battle_snake.py # Orquestador principal del modo (interfaz con Pygame)
+        │   ├── core/            # 🧠 Mecánicas puras e independientes de renderizado
+        │   │   ├── __init__.py
+        │   │   └── logic.py     # Lógica matemática: colisiones en grilla y validación de comida
+        │   └── domain/          # 👥 Entidades del juego (Modelado de datos)
+        │       ├── __init__.py
+        │       ├── constants.py # Dimensiones de grilla, ticks, controles y paleta cromática local
+        │       ├── food.py      # Entidad comida y su algoritmo de reubicación aleatoria segura
+        │       └── snake.py     # Entidad serpiente (gestión de cuerpo, dirección e ID de jugador)
         │
-        └── modo_juego_3/       # MODO 3 al 7... (Misma estructura modularizada)
-            ├── __init__.py
-            └── ...
+        └── modo_juego_3/       # MODO 3 al 7... (Estructura modularizada idéntica en desarrollo)
+            └── __init__.py
 ```
 
 ---
@@ -97,13 +100,23 @@ Maneja el bucle `while` nativo de Pygame, gestiona la ventana física y despacha
 *   **`base_scene.py`**: Define un contrato rígido mediante métodos virtuales abstractos (`manejar_eventos()`, `actualizar()`, `dibujar()`). Esto asegura que el `GameManager` pueda tratar a cualquier pantalla de forma polimórfica sin conocer sus particularidades internas.
 *   **`main_menu.py` y `game_select.py`**: Gestionan las pantallas iniciales del Hub utilizando los componentes interactivos definidos en `src/ui/components.py`. El selector de juego lee de forma dinámica la lista de módulos disponibles en la carpeta `modes/`.
 
-### 5. Arquitectura de Modos de Juego (`src/modes/`)
-Cada uno de los 7 juegos se concibe como un submódulo totalmente aislado de los demás:
-*   **`base_mode.py`**: Funciona de forma homóloga a `base_scene.py`, estandarizando cómo se inicializa, actualiza y renderiza un minijuego dentro del contenedor general.
-*   **`gravity_runner/`**: Contiene la lógica migrada desde `script.py`. Las clases `Jugador`, `Obstaculo` y `Particula` se encapsulan en `entities.py`. El archivo `runner_game.py` toma el control de las físicas elásticas, la aceleración progresiva de la velocidad y el cálculo dinámico de frecuencias de obstáculos, adaptando el entorno para dar soporte a interacciones multijugador simultáneas en la misma pantalla.
-
 ---
 
+## 🛠️ Desglose Técnico de los Modos Activos
+
+### 🎮 Modo 1: Gravity Runner (`src/modes/gravity_runner/`)
+Un juego vertiginoso de carrera infinita y esquive de obstáculos con mecánicas de gravedad inversa. 
+* **`core/physics.py`**: Gobierna el motor de colisiones y la aceleración progresiva de la velocidad del juego.
+* **`domain/player.py` & `obstacle.py`**: Modelan los atributos del jugador (velocidad, estado de salto) y los patrones dinámicos de los obstáculos.
+
+### 🐍 Modo 2: Versus Snake (`src/modes/modo_juego_2/`)
+El mítico arcade de la serpiente reinventado en una intensa arena competitiva local para dos jugadores simultáneos.
+* **`domain/snake.py`**: Clase entidad totalmente parametrizada por `jugador_id`. Controla de forma aislada el crecimiento del cuerpo y restringe los giros no permitidos (evitando autodestrucciones por contramarcha física).
+* **`domain/food.py`**: Implementa lógica inteligente de reubicación mediante `food.reubicar(cuerpos_totales)`, asegurando de forma predictiva que el alimento jamás aparezca debajo de ninguno de los jugadores.
+* **`core/logic.py` (SnakeLogic)**: Concentra las reglas de negocio puras del juego. Realiza el chequeo de colisiones cruzadas (si una serpiente choca contra sí misma o contra el cuerpo del rival) de manera estricta y agnóstica a la librería gráfica.
+* **`mode_two_game.py`**: Actúa como el controlador principal. Capta de forma diferenciada las entradas de control (**Jugador 1: WASD** y **Jugador 2: Flechas de dirección**) y despacha de manera unificada los estados de la partida (`JUGANDO` / `GAME_OVER`).
+
+---
 ## 🧠 Leyes y Buenas Prácticas Aplicadas
 
 1.  **Bajo Acoplamiento y Alta Cohesión:** El motor del launcher no conoce las reglas, mecánicas ni sistemas de puntuación de los minijuegos. Esto evita dependencias cruzadas destructivas.

@@ -1,4 +1,4 @@
-from src.modes.modo_juego_2.domain.constants import DIR_ARRIBA, DIR_ABAJO, DIR_IZQUIERDA, DIR_DERECHA
+from src.modes.battle_snake.domain.constants import DIR_ARRIBA, DIR_ABAJO, DIR_IZQUIERDA, DIR_DERECHA
 
 class Snake:
     def __init__(self, x, y, jugador_id):

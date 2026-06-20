@@ -1,4 +1,4 @@
-from src.modes.modo_juego_2.domain.constants import ANCHO_GRID, ALTO_GRID
+from src.modes.battle_snake.domain.constants import ANCHO_GRID, ALTO_GRID
 
 class SnakeLogic:
     @staticmethod

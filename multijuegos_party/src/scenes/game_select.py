@@ -3,7 +3,7 @@ from config import settings
 from src.scenes.base_scene import BaseScene
 from src.ui.components import Boton
 from src.modes.gravity_runner.runner_game import RunnerGame
-from src.modes.modo_juego_2.mode_two_game import ModeTwoGame
+from src.modes.battle_snake.battle_snake import battleSnakeGame
 
 class GameSelect(BaseScene):
     def __init__(self, manager):
@@ -36,7 +36,7 @@ class GameSelect(BaseScene):
                 self.manager.cambiar_escena(RunnerGame(self.manager))
                 
             if self.btn_snake.manejar_eventos(evento):
-                self.manager.cambiar_escena(ModeTwoGame(self.manager))
+                self.manager.cambiar_escena(battleSnakeGame(self.manager))
                 
             if self.btn_volver.manejar_eventos(evento):
                 self.manager.cambiar_escena(MainMenu(self.manager))

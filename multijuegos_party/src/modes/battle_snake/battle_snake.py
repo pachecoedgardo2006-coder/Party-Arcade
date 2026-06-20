@@ -1,11 +1,11 @@
 import pygame
 from config import settings
-from src.modes.modo_juego_2.domain.snake import Snake
-from src.modes.modo_juego_2.domain.food import Food
-from src.modes.modo_juego_2.domain.constants import *
-from src.modes.modo_juego_2.core.logic import SnakeLogic
+from src.modes.battle_snake.domain.snake import Snake
+from src.modes.battle_snake.domain.food import Food
+from src.modes.battle_snake.domain.constants import *
+from src.modes.battle_snake.core.logic import SnakeLogic
 
-class ModeTwoGame:
+class battleSnakeGame:
     def __init__(self, manager):
         self.manager = manager
         self.fuente_pequena = pygame.font.SysFont("consolas", 22)
