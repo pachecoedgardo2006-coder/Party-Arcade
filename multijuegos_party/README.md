@@ -79,16 +79,31 @@ multijuegos_party/
         │       ├── food.py      # Entidad comida y su algoritmo de reubicación aleatoria segura
         │       └── snake.py     # Entidad serpiente (gestión de cuerpo, dirección e ID de jugador)
         │
-        └── memory_grid/        # 🧠 MODO 3: Memory Grid (Tablero de Pares por Turnos)
-            ├── __init__.py
-            ├── memory_game.py  # Orquestador principal del modo (interfaz visual y clics del mouse)
-            ├── core/            # 🧠 Mecánicas puras y control lógico de turnos
-            │   ├── __init__.py
-            │   └── logic.py     # Lógica pura: validación de pares, mezcla aleatoria y flujo de puntaje
-            └── domain/          # 👥 Entidades del juego (Modelado de datos de la grilla)
+        ├── memory_grid/        # 🧠 MODO 3: Memory Grid (Tablero de Pares por Turnos)
+        │   ├── __init__.py
+        │   ├── memory_game.py  # Orquestador principal del modo (interfaz visual y clics del mouse)
+        │   ├── core/            # 🧠 Mecánicas puras y control lógico de turnos
+        │   │   ├── __init__.py
+        │   │   └── logic.py     # Lógica pura: validación de pares, mezcla aleatoria y flujo de puntaje
+        │   └── domain/          # 👥 Entidades del juego (Modelado de datos de la grilla)
+        │       ├── __init__.py
+        │       ├── card.py      # Entidad tarjeta (estado atómico de visibilidad y colisiones)
+        │       └── constants.py # Parámetros locales: grilla 5x10, colores Neón locales y timers
+        │
+        └── multijuegos_party/src/modes/
+            │
+            └── sumo_combat/                 # 🚀 MODO 4: Pelea de Sumos Top-Down (Versus)
                 ├── __init__.py
-                ├── card.py      # Entidad tarjeta (estado atómico de visibilidad y colisiones)
-                └── constants.py # Parámetros locales: grilla 5x10, colores Neón locales y timers
+                ├── sumo_game.py             # Orquestador principal (conecta bucle, eventos y render)
+                │
+                ├── core/                    # 🧠 Mecánicas puras y físicas vectoriales
+                │   ├── __init__.py
+                │   └── physics.py           # Físicas de empuje, fricción, rebote elástico y límites de la arena
+                │
+                └── domain/                  # 👥 Entidades y datos locales
+                    ├── __init__.py
+                    ├── constants.py         # Dimensiones de la arena, masas, fuerzas y colores locales
+                    └── wrestler.py          # Entidad del luchador (posición, velocidad, vector dirección, ID)
 ```
 
 ---
@@ -130,6 +145,13 @@ Un desafío táctico de memoria visual y concentración por turnos, donde dos ju
 * **`domain/constants.py`**: Centraliza de manera estricta las filas, columnas, dimensiones de diseño neón y los intervalos de tiempo en milisegundos (el temporizador inicial de memorización de 4 segundos y el retraso de bloqueo por error).
 * **`core/logic.py` (MemoryLogic)**: Concentra las reglas de negocio e integridad del minijuego. Ejecuta el algoritmo de mezcla aleatoria de los 25 pares de identificadores, valida si las dos tarjetas seleccionadas coinciden y gestiona de manera encapsulada el flujo estricto del cambio de turnos (P1 vs P2) según los aciertos.
 * **`memory_game.py`**: Actúa como la escena operativa principal acoplada al Hub. Controla la captura de coordenadas del ratón, dibuja el tablero centrado dinámicamente según la resolución global e implementa la máquina de estados interna (`MEMORIZANDO`, `JUGANDO`, `BLOQUEADO`, `GAME_OVER`) que congela clics ilegítimos o maliciosos durante los procesos de animación.
+
+### 🤼 Modo 4: Sumo Combat (`src/modes/sumo_combat/`)
+Un intenso enfrentamiento arcade de empuje e inercias con vista cenital (top-down), donde dos luchadores compiten dentro de una arena circular de peligro por ver quién logra expulsar a su rival del ring en partidas al mejor de 3 puntos.
+* **`domain/wrestler.py`**: Modela de forma atómica las propiedades físicas individuales de cada luchador (posición, vectores de velocidad e ID del jugador). Gestiona de manera aislada la captura de periféricos en tiempo real aplicando aceleraciones vectoriales normalizadas y coeficientes de fricción dinámica para evitar desplazamientos infinitos.
+* **`domain/constants.py`**: Centraliza estrictamente las dimensiones del ring, los radios de colisión de las entidades, los multiplicadores de fuerza de empuje ajustados, el límite de puntuación para la victoria y el mapeo de hardware dual (Jugador 1: WASD | Jugador 2: Flechas de dirección).
+* **`core/physics.py` (SumoPhysics)**: Concentra el motor matemático y físico puro del minijuego de forma agnóstica al renderizado. Implementa algoritmos de separación física inmediata ante colisiones para erradicar bugs de interpenetración y resuelve la transferencia de cantidad de movimiento elástica mediante un multiplicador de impacto elevado que eyecta a los jugadores en colisiones de alta velocidad.
+* **`sumo_game.py`**: Actúa como el orquestador y controlador principal acoplado al Launcher. Maneja el ciclo de vida de la escena, la distribución de puntos por prioridad secuencial en los límites radiales de la arena circular y despliega una máquina de estados interna con fases de congelamiento y preparación para garantizar un inicio limpio y justo en cada ronda.
 
 ---
 ## 🧠 Leyes y Buenas Prácticas Aplicadas

@@ -5,8 +5,9 @@ from src.scenes.base_scene import BaseScene
 from src.ui.components import Boton
 from src.modes.gravity_runner.runner_game import RunnerGame
 from src.modes.battle_snake.battle_snake import battleSnakeGame
-# Importamos la clase principal de la escena del modo 3
 from src.modes.memory_grid.memory_game import MemoryGame
+# 🚀 NUEVO: Importamos el orquestador del Modo 4
+from src.modes.sumo_combat.sumo_game import SumoGame
 
 class GameSelect(BaseScene):
     def __init__(self, manager):
@@ -25,14 +26,20 @@ class GameSelect(BaseScene):
             "2. SNAKE VERSUS", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
-        # 🚀 NUEVO: Botón para iniciar el Modo 3 (Memory Grid)
+        # Botón para iniciar el Modo 3 (Memory Grid)
         self.btn_memory = Boton(
             settings.ANCHO // 2 - 200, 330, 400, 50,
             "3. MEMORY GRID (5X10)", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
+        # 🚀 NUEVO: Botón para iniciar el Modo 4 (Sumo Combat) con un desfase de Y=395
+        self.btn_sumo = Boton(
+            settings.ANCHO // 2 - 200, 395, 400, 50,
+            "4. SUMO COMBAT", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
+        )
+        
         self.btn_volver = Boton(
-            settings.ANCHO // 2 - 100, settings.ALTO - 120, 200, 45,
+            settings.ANCHO // 2 - 100, settings.ALTO - 100, 200, 45,
             "VOLVER", settings.COLOR_PLATAFORMA, settings.JUGADOR_COLOR, settings.TEXTO_COLOR
         )
 
@@ -47,9 +54,12 @@ class GameSelect(BaseScene):
             if self.btn_snake.manejar_eventos(evento):
                 self.manager.cambiar_escena(battleSnakeGame(self.manager))
                 
-            # Capturamos el evento del nuevo botón para lanzar el Modo 3
             if self.btn_memory.manejar_eventos(evento):
                 self.manager.cambiar_escena(MemoryGame(self.manager))
+                
+            # 🚀 NUEVO: Capturamos el clic del botón de Sumos para iniciar la escena
+            if self.btn_sumo.manejar_eventos(evento):
+                self.manager.cambiar_escena(SumoGame(self.manager))
                 
             if self.btn_volver.manejar_eventos(evento):
                 self.manager.cambiar_escena(MainMenu(self.manager))
@@ -61,10 +71,11 @@ class GameSelect(BaseScene):
         pantalla.fill(settings.COLOR_FONDO)
         
         txt_titulo = self.fuente_titulo.render("SELECCIONA UN JUEGO", True, settings.TEXTO_COLOR)
-        pantalla.blit(txt_titulo, (settings.ANCHO // 2 - txt_titulo.get_width() // 2, 100))
+        pantalla.blit(txt_titulo, (settings.ANCHO // 2 - txt_titulo.get_width() // 2, 120))
         
-        # Renderizamos los componentes interactivos en pantalla
+        # Renderizamos todos los componentes interactivos
         self.btn_runner.dibujar(pantalla)
         self.btn_snake.dibujar(pantalla)
-        self.btn_memory.dibujar(pantalla) # El botón del modo 3 ahora es visible y clickeable
+        self.btn_memory.dibujar(pantalla)
+        self.btn_sumo.dibujar(pantalla)  # 🚀 Agregado al bucle de renderizado
         self.btn_volver.dibujar(pantalla)
