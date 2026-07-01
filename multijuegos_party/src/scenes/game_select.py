@@ -6,8 +6,8 @@ from src.ui.components import Boton
 from src.modes.gravity_runner.runner_game import RunnerGame
 from src.modes.battle_snake.battle_snake import battleSnakeGame
 from src.modes.memory_grid.memory_game import MemoryGame
-# 🚀 NUEVO: Importamos el orquestador del Modo 4
 from src.modes.sumo_combat.sumo_game import SumoGame
+from src.modes.retro_racing.racing_game import RacingGame
 
 class GameSelect(BaseScene):
     def __init__(self, manager):
@@ -32,10 +32,16 @@ class GameSelect(BaseScene):
             "3. MEMORY GRID (5X10)", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
-        # 🚀 NUEVO: Botón para iniciar el Modo 4 (Sumo Combat) con un desfase de Y=395
+        # Botón para iniciar el Modo 4 (Sumo Combat)
         self.btn_sumo = Boton(
             settings.ANCHO // 2 - 200, 395, 400, 50,
             "4. SUMO COMBAT", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
+        )
+        
+        # Botón para iniciar el Modo 5 (Retro Racing)
+        self.btn_racing = Boton(
+            settings.ANCHO // 2 - 200, 460, 400, 50,
+            "5. RETRO RACING", settings.COLOR_PLATAFORMA, settings.LINEA_NEON, settings.TEXTO_COLOR
         )
         
         self.btn_volver = Boton(
@@ -57,9 +63,11 @@ class GameSelect(BaseScene):
             if self.btn_memory.manejar_eventos(evento):
                 self.manager.cambiar_escena(MemoryGame(self.manager))
                 
-            # 🚀 NUEVO: Capturamos el clic del botón de Sumos para iniciar la escena
             if self.btn_sumo.manejar_eventos(evento):
                 self.manager.cambiar_escena(SumoGame(self.manager))
+                
+            if self.btn_racing.manejar_eventos(evento):
+                self.manager.cambiar_escena(RacingGame(self.manager))
                 
             if self.btn_volver.manejar_eventos(evento):
                 self.manager.cambiar_escena(MainMenu(self.manager))
@@ -77,5 +85,6 @@ class GameSelect(BaseScene):
         self.btn_runner.dibujar(pantalla)
         self.btn_snake.dibujar(pantalla)
         self.btn_memory.dibujar(pantalla)
-        self.btn_sumo.dibujar(pantalla)  # 🚀 Agregado al bucle de renderizado
+        self.btn_sumo.dibujar(pantalla)
+        self.btn_racing.dibujar(pantalla)
         self.btn_volver.dibujar(pantalla)

@@ -1,23 +1,31 @@
-# src/modes/gravity_runner/domain/obstacle.py
 import pygame
 import random
 from config import settings
+from .constants import (
+    ANCHO_OBS_MIN, ANCHO_OBS_MAX, ALTO_OBS_MIN, ALTO_OBS_MAX,
+    TIPO_SUELO, TIPO_TECHO, TIPO_AEREO
+)
 
 class Obstaculo:
     def __init__(self, velocidad):
-        self.ancho = random.randint(30, 50)
-        self.alto = random.randint(50, 120)
-        self.x = settings.ANCHO
         self.velocidad = velocidad
-        self.tipo = random.choice([0, 1, 2]) # 0: Suelo, 1: Techo, 2: Aéreo
+        self.x = settings.ANCHO
+        self.tipo = random.choice([TIPO_SUELO, TIPO_TECHO, TIPO_AEREO])
         
-        if self.tipo == 0:
-            self.y = settings.SUELO_Y - self.alto
-        elif self.tipo == 1:
-            self.y = settings.TECHO_Y
-        else:
+        # Dimensiones dinámicas según tipo para balancear dificultad
+        if self.tipo == TIPO_AEREO:
+            self.ancho = random.randint(30, 45)
             self.alto = 50
-            self.y = (settings.ALTO // 2) - (self.alto // 2) + random.randint(-40, 40)
+            # Posición central con ligera variación controlada
+            self.y = (settings.ALTO // 2) - (self.alto // 2) + random.randint(-30, 30)
+        else:
+            self.ancho = random.randint(ANCHO_OBS_MIN, ANCHO_OBS_MAX)
+            self.alto = random.randint(ALTO_OBS_MIN, ALTO_OBS_MAX)
+            
+            if self.tipo == TIPO_SUELO:
+                self.y = settings.SUELO_Y - self.alto
+            elif self.tipo == TIPO_TECHO:
+                self.y = settings.TECHO_Y
 
     def actualizar(self):
         self.x -= self.velocidad

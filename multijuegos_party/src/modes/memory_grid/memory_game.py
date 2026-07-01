@@ -70,6 +70,15 @@ class MemoryGame(BaseScene):
                             # Hubo coincidencia exitosa. Comprobamos fin de partida instantáneamente
                             if self.logic.verificar_victoria(self.tablero):
                                 self.estado_interno = ESTADO_GAME_OVER
+
+                                if self.logic.puntuacion_p1 > self.logic.puntuacion_p2:
+                                    self.manager.registrar_victoria(1)
+                                elif self.logic.puntuacion_p2 > self.logic.puntuacion_p1:
+                                    self.manager.registrar_victoria(2)
+                                else:
+                                    # En caso de empate técnico, decides si darlo al P1 o manejar un 0
+                                    self.manager.registrar_victoria(0)
+
                         elif resultado is False:
                             # Error de coincidencia. Bloqueamos tablero y agendamos temporizador de ocultación
                             self.estado_interno = ESTADO_BLOQUEADO

@@ -1,8 +1,8 @@
 # src/modes/memory_grid/domain/constants.py
 
-# Configuración de la Grilla (5 filas x 10 columnas = 50 tarjetas / 25 pares)
+# Configuración de la Grilla (5 filas x 6 columnas = 30 tarjetas / 15 pares)
 FILAS = 5
-COLUMNAS = 10
+COLUMNAS = 6
 
 # Dimensiones de las tarjetas
 TARJETA_ANCHO = 65

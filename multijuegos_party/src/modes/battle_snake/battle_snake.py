@@ -95,6 +95,13 @@ class battleSnakeGame:
                     snake.viva = False
                     self.estado_interno = "GAME_OVER"
 
+            if self.estado_interno == "GAME_OVER":
+                # Si la serpiente 1 murió, gana el Jugador 2. Si no, gana el Jugador 1.
+                if not self.snakes[0].viva:
+                    self.manager.registrar_victoria(2)
+                else:
+                    self.manager.registrar_victoria(1)
+
     def dibujar(self, superficie):
         superficie.fill(COLOR_FONDO)
 

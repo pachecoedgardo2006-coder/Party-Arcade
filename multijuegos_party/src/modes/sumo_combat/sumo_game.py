@@ -83,6 +83,12 @@ class SumoGame(BaseScene):
             # Validar condiciones de fin de juego completas
             if self.puntuacion_p1 >= PUNTOS_VICTORIA or self.puntuacion_p2 >= PUNTOS_VICTORIA:
                 self.estado_interno = "GAME_OVER"
+
+                if self.puntuacion_p1 > self.puntuacion_p2:
+                    self.manager.registrar_victoria(1)
+                else:
+                    self.manager.registrar_victoria(2)
+                    
             else:
                 self.reiniciar_ronda()
 
